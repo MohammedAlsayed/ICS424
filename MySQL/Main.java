@@ -2,7 +2,6 @@ package MySQL;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.NoSuchFileException;
 import java.sql.SQLException;
 import java.util.Random;
 import java.util.Scanner;
@@ -12,6 +11,18 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String []args) throws Exception{
+        System.out.println("Started populating !!!");
+        long startTime = System.nanoTime();
+        int rows = FriendManager.populate500000rows();
+        long estimatedTime = System.nanoTime() - startTime;
+        System.out.println("Estimated time: "+estimatedTime/1000000000.0);
+        System.out.println(rows);
+    }
+
+
+
+
+    public static void readAndPopulate() throws FileNotFoundException{
         String [] boys = new String [1000];
         String [] girls = new String[1000];
         Scanner scanB = new Scanner(new File("/Users/alsayed/ICS424/src/MySQL/boys.txt"));
