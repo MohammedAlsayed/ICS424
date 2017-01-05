@@ -25,7 +25,7 @@ public class FriendManager {
     }
 
     public synchronized static boolean createFriends(int id1, int id2) throws SQLException {
-        String sql = "INSERT INTO friends_one_million VALUES (?, ?)";
+        String sql = "INSERT INTO friends_500_thous_random_copy VALUES (?, ?)";
 
         // creating connection: this form of try is used to close resources after execution
         try (Connection connection = DBUtil.getConnection();
@@ -55,6 +55,7 @@ public class FriendManager {
      * @throws SQLException
      */
     public static int populate500000rows() {
+        int range = 400000;
         int personCounts = 1;
         int friendsCount = 1;
         Random personRandom = new Random();
@@ -62,9 +63,9 @@ public class FriendManager {
         int numberRows = 0;
 
         while (personCounts <= 5000) {
-            int personNumber = personRandom.nextInt(Person.PERSON_ROWS);
             while (friendsCount <= 100) {
-                int friendNumber = friendRandom.nextInt(Person.PERSON_ROWS);
+                int personNumber = personRandom.nextInt(range);
+                int friendNumber = friendRandom.nextInt(range);
                 try {
                     if (personNumber != friendNumber) {
                         createFriends(personNumber, friendNumber);
@@ -72,8 +73,8 @@ public class FriendManager {
                         numberRows++;
                     }
                 } catch (SQLException e) {
-                    personNumber = personRandom.nextInt(Person.PERSON_ROWS);
-                    friendNumber = friendRandom.nextInt(Person.PERSON_ROWS);
+                    personNumber = personRandom.nextInt(range);
+                    friendNumber = friendRandom.nextInt(range);
                 }
             }
             friendsCount = 1;
@@ -116,16 +117,33 @@ public class FriendManager {
     }
 
     public static ResultSet getFOF3() throws SQLException{
-        String sql =
-                "Select *\n" +
-                        "from \n" +
-                        "( select * from friends_500_thousand where person1 = 4305) q1\n" +
-                        "join \n" +
-                        "(select * from friends_500_thousand) q2\n" +
-                        "on q1.`person2` = q2.`person1`\n" +
-                        "join \n" +
-                        "(select * from friends_500_thousand) q3\n" +
-                        "on q2.`person2` = q3.`person1`\n" ;
+        String sql = "Select *\n" +
+                "from \n" +
+                "( select * from friends_500_thous_random_copy where person1 = 4999) q1\n" +
+                "join \n" +
+                "(select * from friends_500_thous_random_copy) q2\n" +
+                "on q1.`person2` = q2.`person1`\n" +
+                "join \n" +
+                "(select * from friends_500_thous_random_copy) q3\n" +
+                "on q2.`person2` = q3.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q4\n" +
+                "on q3.`person2` = q4.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q5\n" +
+                "on q4.`person2` = q5.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q6\n" +
+                "on q5.`person2` = q6.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q7\n" +
+                "on q6.`person2` = q7.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q8\n" +
+                "on q7.`person2` = q8.`person1`\n" +
+                "join\n" +
+                "(select * from friends_500_thous_random_copy) q9\n" +
+                "on q8.`person2` = q9.`person1`";
         ResultSet rs;
 
         try(Connection conn = DBUtil.getConnection();

@@ -13,10 +13,10 @@ public class Main {
     public static void main(String []args) throws Exception{
         System.out.println("Started populating !!!");
         long startTime = System.nanoTime();
-        int rows = FriendManager.populate500000rows();
+        FriendManager.getFOF3();
         long estimatedTime = System.nanoTime() - startTime;
         System.out.println("Estimated time: "+estimatedTime/1000000000.0);
-        System.out.println(rows);
+
     }
 
 

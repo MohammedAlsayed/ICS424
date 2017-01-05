@@ -5,7 +5,7 @@ package MySQL;
  */
 
 public class Person {
-    public static int PERSON_ROWS = 1000000;
+    public static int PERSON_ROWS = 5000;
     private int id;
     private String name;
 
