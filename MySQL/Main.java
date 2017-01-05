@@ -11,12 +11,26 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String []args) throws Exception{
-        System.out.println("Started populating !!!");
+        // Seeding 100K records
+        System.out.println("Started populating 1 !!!");
         long startTime = System.nanoTime();
-        FriendManager.getFOF3();
+        FriendManager.seed("100K");
         long estimatedTime = System.nanoTime() - startTime;
-        System.out.println("Estimated time: "+estimatedTime/1000000000.0);
+        System.out.println("Estimated time 1 : "+estimatedTime/1000000000.0);
 
+        // Seeding 1M records
+        System.out.println("Started populating 2 !!!");
+        startTime = System.nanoTime();
+        FriendManager.seed("1M");
+        estimatedTime = System.nanoTime() - startTime;
+        System.out.println("Estimated time 2 : "+estimatedTime/1000000000.0);
+
+        // Seeding 10M records
+        System.out.println("Started populating 3 !!!");
+        startTime = System.nanoTime();
+        FriendManager.seed("10M");
+        estimatedTime = System.nanoTime() - startTime;
+        System.out.println("Estimated time 3 : "+estimatedTime/1000000000.0);
     }
 
 
