@@ -23,7 +23,7 @@ public class FriendManager {
             }
         }
     }
-
+//
     public synchronized static boolean createFriends(int id1, int id2) throws SQLException {
         String sql = "INSERT INTO friends_500_thous_random_copy VALUES (?, ?)";
 
