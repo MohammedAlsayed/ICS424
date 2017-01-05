@@ -46,16 +46,12 @@ public class FriendManager {
 
 
     /**
-     * The method will populate 1000 friends in the following way:
-     * 100 person, and every person has 10 friends.
-     * The 100 person and 10 friends will be chosen from
-     * a random number generator
      *
-     * @return the number of persons added
+     * @return the number of friend realtionships added
      * @throws SQLException
      */
     public static int populate500000rows() {
-        int range = 400000;
+        int range = 400000; //range of id's to chose from the person DB
         int personCounts = 1;
         int friendsCount = 1;
         Random personRandom = new Random();
@@ -64,26 +60,35 @@ public class FriendManager {
 
         while (personCounts <= 5000) {
             while (friendsCount <= 100) {
-                int personNumber = personRandom.nextInt(range);
-                int friendNumber = friendRandom.nextInt(range);
+
+                // changing person's and his friend's id at each iteration to be more random in insertion.
+                int personNumber = personRandom.nextInt(range);    // person1 to add to the friend DB
+                int friendNumber = friendRandom.nextInt(range);    // person2 is the friend of person1
                 try {
                     if (personNumber != friendNumber) {
                         createFriends(personNumber, friendNumber);
-                        friendsCount++;
+                        friendsCount++;   // adding friends after creation, so when exception is thrown no friend is added.
                         numberRows++;
                     }
                 } catch (SQLException e) {
+                    // change there id's when an exception is thrown.
                     personNumber = personRandom.nextInt(range);
                     friendNumber = friendRandom.nextInt(range);
                 }
             }
-            friendsCount = 1;
+            friendsCount = 1;  // reset the number of friends of person. To start adding friends for a new person
             personCounts++;
         }
         return numberRows;
     }
 
 
+    /**
+     * This method add fiends in sequence
+     * e.g for person with id = 1, his friends will be persons with the following id (2,3,4,5,.. etc) up to 100 friends.
+     * then person with id = 2 friends will be persons with id's (3,4,5,6,... etc) up to 100 friends.
+     * @return
+     */
     public static int populate5000000rowsSeq() {
         int personCounts = 1;
         int friendsCount = 1;
@@ -116,7 +121,7 @@ public class FriendManager {
         return numberRows;
     }
 
-    public static ResultSet getFOF3() throws SQLException{
+    public static ResultSet getFOF() throws SQLException{
         String sql = "Select *\n" +
                 "from \n" +
                 "( select * from friends_500_thous_random_copy where person1 = 4999) q1\n" +
