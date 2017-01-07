@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import MySQL.*;
 
 import org.neo4j.driver.v1.*;
+import org.neo4j.driver.v1.summary.ResultSummary;
+import org.neo4j.driver.v1.summary.*;
 
 public class Main {
 	
@@ -28,30 +31,9 @@ public class Main {
 		
 		//insertPersonNodes(50000, 7888);
 	
-        
-        insertFriendRelationships(20, 7777);
+        // insertFriendRelationships(20, 7777);
 
-
-		
-   
-
-        
-		
-		// search for all person nodes
-//        String searchConnectedNodesQuery = "match (n:Man)<-[:helps]-(m) where n.id = 650 return m.id as id";
-//        String getAllNodesQuery = "match (n) return n.name as name";
-//        String getLvl4FriendsQuery = "match (n:Man {id:8142})-[:helps]->(m:Man) match (m)-[:helps]->(p) match (p)-[:helps]->(o) match (o)-[:helps]->(q) return count(q) as cnt";
-//        
-//		StatementResult sr = session.run(getLvl4FriendsQuery);
-//		
-//		
-//		while(sr.hasNext()){
-//			
-//			Record record = sr.next();
-//			System.out.println(record.get("cnt").asInt());
-//		}
-//        
-//        
+		// getTimeSummary(7687);
 		
 	}
 	
@@ -84,7 +66,7 @@ public class Main {
         System.out.println("Connecting to Neo4j ...");
         
         // initialize database connection
-        Driver driver = GraphDatabase.driver("bolt://localhost:" + portNumber, AuthTokens.basic("neo4j", "qwerty"));
+        Driver driver = GraphDatabase.driver("bolt://localhost:" + portNumber, AuthTokens.basic("neo4j", "neo4j"));
 		Session session = driver.session();
 		
 		Random rnd = new Random();
@@ -117,7 +99,7 @@ public class Main {
 		System.out.println("Connecting to Neo4j ...");
         
         // initialize database connection
-        Driver driver = GraphDatabase.driver("bolt://localhost:" + portNumber, AuthTokens.basic("neo4j", "qwerty"));
+        Driver driver = GraphDatabase.driver("bolt://localhost:" + portNumber, AuthTokens.basic("neo4j", "neo4j"));
 		Session session = driver.session();
 		
 		Random rnd = new Random();
@@ -150,10 +132,116 @@ public class Main {
         
         System.out.println("Inserted " + numberOfRelationsPerPerson * 50 + "K relations in " + time + " seconds");
         
+        
 		session.close();
 		driver.close();
+        
+	}
+	
+	
+	public static void getTimeSummary(int portNumber){
+		
+		System.out.println("Connecting to Neo4j ...");
+        
+        // initialize database connection
+        Driver driver = GraphDatabase.driver("bolt://localhost:" + portNumber, AuthTokens.basic("neo4j", "neo4j"));
+		Session session = driver.session();
+		
+		String lvlOneQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+				   	       + "return m.id";
+		
+		String lvlTwoQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+						   + "match (m)-[:friend]->(p) where p <> n "
+						   + "return p.id";
 		
 		
+		String lvlThreeQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+							 + "match (m)-[:friend]->(p) where p <> n "
+							 + "match (p)-[:friend]->(o) where o <> m and o <> n "
+							 + "return o.id";
+						
+		
+		String lvlFourQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+							+ "match (m)-[:friend]->(p)where p <> n "
+							+ "match (p)-[:friend]->(o) where o <> m and o <> n "
+							+ "match (o)-[:friend]->(r) where r <> p and r <> m and r <> n "
+							+ "return r.id";
+		
+		String lvlFiveQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+							+ "match (m)-[:friend]->(p) where p <> n "
+							+ "match (p)-[:friend]->(o) where o <> m and o <> n "
+							+ "match (o)-[:friend]->(r) where r <> p and r <> m and r <> n "
+							+ "match (r)-[:friend]->(b) where b <> o and b <> p and b <> m and b <> n "
+							+ "return b.id";
+		
+		String lvlSixQuery = "match (n:Person {id:16751})-[:friend]->(m:Person) "
+						   + "match (m)-[:friend]->(p) where p <> n "
+						   + "match (p)-[:friend]->(o) where o <> m and o <> n "
+					   	   + "match (o)-[:friend]->(r) where r <> p and r <> m and r <> n "
+						   + "match (r)-[:friend]->(b) where b <> o and b <> p and b <> m and b <> n "
+						   + "match (b)-[:friend]->(c) where c <> r and c <> o and c <> p and c <> m and c <> n "
+						   + "return c.id";
+		
+		
+		long t1 = System.nanoTime();
+		
+
+		
+		try(Transaction tx = session.beginTransaction()){
+			ResultSummary resultSummary = tx.run(lvlOneQuery).consume();
+			
+			System.out.println("LVL1: Available after: " + resultSummary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+			System.out.println("LVL1: Consumed after: " + resultSummary.resultConsumedAfter(TimeUnit.MILLISECONDS));
+			
+		}
+		
+		System.out.println();
+		
+		try(Transaction tx = session.beginTransaction()){
+			ResultSummary resultSummary = tx.run(lvlTwoQuery).consume();
+			
+			System.out.println("LVL2: Available after: " + resultSummary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+			System.out.println("LVL2: Consumed after: " + resultSummary.resultConsumedAfter(TimeUnit.MILLISECONDS));		
+		}
+		
+		System.out.println();
+		
+		try(Transaction tx = session.beginTransaction()){
+			ResultSummary resultSummary = tx.run(lvlThreeQuery).consume();
+			
+			System.out.println("LVL3: Available after: " + resultSummary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+			System.out.println("LVL3: Consumed after: " + resultSummary.resultConsumedAfter(TimeUnit.MILLISECONDS));		
+		}		
+		
+		System.out.println();
+		
+		try(Transaction tx = session.beginTransaction()){
+			ResultSummary resultSummary = tx.run(lvlFourQuery).consume();
+			
+			System.out.println("LVL4: Available after: " + resultSummary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+			System.out.println("LVL4: Consumed after: " + resultSummary.resultConsumedAfter(TimeUnit.MILLISECONDS));		
+		}		
+		
+		System.out.println();
+		
+		try(Transaction tx = session.beginTransaction()){
+			ResultSummary resultSummary = tx.run(lvlFiveQuery).consume();
+			
+			System.out.println("LVL5: Available after: " + resultSummary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+			System.out.println("LVL5: Consumed after: " + resultSummary.resultConsumedAfter(TimeUnit.MILLISECONDS));		
+		}		
+		
+		
+		
+		
+		long t2 = System.nanoTime();
+        
+        double time = (t2 - t1) / 1000000000.0;
+        
+        System.out.println("Finished summary in " + time + " seconds");
+        
+		session.close();
+		driver.close();	
 	}
 	
 }
